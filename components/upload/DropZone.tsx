@@ -15,6 +15,16 @@ export function DropZone({ onFileSelect, disabled = false }: DropZoneProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
+  const validateAndSetFile = useCallback((file: File) => {
+    const validTypes = ['audio/mpeg', 'audio/wav', 'audio/x-m4a', 'video/mp4']
+    if (validTypes.includes(file.type)) {
+      setSelectedFile(file)
+      onFileSelect(file)
+    } else {
+      alert("Invalid file type. Please upload MP3, WAV, M4A or MP4.")
+    }
+  }, [onFileSelect])
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault()
     if (!disabled) setIsDragging(true)
@@ -29,12 +39,11 @@ export function DropZone({ onFileSelect, disabled = false }: DropZoneProps) {
     e.preventDefault()
     setIsDragging(false)
     if (disabled) return
-
     const files = Array.from(e.dataTransfer.files)
     if (files.length > 0) {
       validateAndSetFile(files[0])
     }
-  }, [disabled])
+  }, [disabled, validateAndSetFile])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -43,21 +52,13 @@ export function DropZone({ onFileSelect, disabled = false }: DropZoneProps) {
     }
   }
 
-  const validateAndSetFile = (file: File) => {
-    const validTypes = ['audio/mpeg', 'audio/wav', 'audio/x-m4a', 'video/mp4']
-    if (validTypes.includes(file.type)) {
-      setSelectedFile(file)
-      onFileSelect(file)
-    } else {
-      alert("Invalid file type. Please upload MP3, WAV, M4A or MP4.")
-    }
-  }
-
   return (
-    <Card 
+    <Card
       className={cn(
         "relative flex flex-col items-center justify-center p-12 text-center border-2 border-dashed transition-all",
-        isDragging ? "border-brand-start bg-brand-start/5" : "border-gray-200 hover:border-brand-start/50 hover:bg-gray-50",
+        isDragging
+          ? "border-brand-start bg-brand-start/5"
+          : "border-gray-200 hover:border-brand-start/50 hover:bg-gray-50",
         disabled && "opacity-50 cursor-not-allowed pointer-events-none"
       )}
       onDragOver={handleDragOver}
@@ -71,7 +72,7 @@ export function DropZone({ onFileSelect, disabled = false }: DropZoneProps) {
         onChange={handleFileChange}
         disabled={disabled || !!selectedFile}
       />
-      
+
       {!selectedFile ? (
         <>
           <div className="rounded-full bg-brand-start/10 p-4 mb-4">
@@ -96,11 +97,13 @@ export function DropZone({ onFileSelect, disabled = false }: DropZoneProps) {
             </div>
             <div className="flex-1 text-left overflow-hidden">
               <p className="text-sm font-semibold text-dark truncate">{selectedFile.name}</p>
-              <p className="text-xs text-gray-500">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+              <p className="text-xs text-gray-500">
+                {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+              </p>
             </div>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               onClick={(e) => {
                 e.preventDefault()
                 setSelectedFile(null)
