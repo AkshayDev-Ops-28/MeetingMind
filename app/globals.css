@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-start: #0A6B62;
+  --color-brand-end: #1EA854;
+  --color-dark: #0A1647;
+  --color-card: #FFFFFF;
+  --color-page: #E4E7E4;
+  
+  --font-sans: "Inter", sans-serif;
+  
+  --shadow-card-hover: 0 4px 16px rgba(10,107,98,0.12);
+  --radius-card: 14px;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-page);
+    color: var(--color-dark);
+    font-family: var(--font-sans);
+    transition: all 250ms ease-out;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+  }
+
+  p, span, div {
+    font-weight: 400;
+  }
+}
+
+@layer utilities {
+  .bg-gradient-brand {
+    background: linear-gradient(135deg, var(--color-brand-start), var(--color-brand-end));
+  }
+  
+  .text-gradient-brand {
+    background: linear-gradient(135deg, var(--color-brand-start), var(--color-brand-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .card-base {
+    background-color: var(--color-card);
+    border-radius: var(--radius-card);
+    transition: all 250ms ease-out;
+  }
+
+  .card-hover:hover {
+    box-shadow: var(--shadow-card-hover);
+  }
+}
