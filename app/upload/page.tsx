@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import { DropZone } from "@/components/upload/DropZone"
 import { ProcessingSteps, type ProcessingStep } from "@/components/upload/ProcessingSteps"
 import { useState } from "react"
+import { createClient } from "@/lib/supabase"
 
 export default function UploadPage() {
   const [currentStep, setCurrentStep] = useState<ProcessingStep | null>(null)
@@ -17,10 +18,23 @@ export default function UploadPage() {
       const formData = new FormData()
       formData.append("file", file)
       
-      const uploadRes = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      })
+     const supabase = createClient()
+      const { data: { session } } = await supabase.auth.getSession()
+console.log("Session check:", session)
+
+if (!session) {
+  alert("You must be logged in to upload.")
+  setCurrentStep(null)
+  return
+}
+
+const uploadRes = await fetch("/api/upload", {
+  method: "POST",
+  headers: {
+    authorization: `Bearer ${session.access_token}`
+  },
+  body: formData,
+})
       
       if (!uploadRes.ok) throw new Error("Upload failed")
       const { meetingId } = await uploadRes.json()
