@@ -1,14 +1,21 @@
-import { GoogleGenerativeAI } from "@google/generative-ai"
+import Groq from "groq-sdk"
 
-const apiKey = process.env.GEMINI_API_KEY
-console.log("Gemini API key present:", !!apiKey)
+const apiKey = process.env.GROQ_API_KEY
+console.log("Groq API key present:", !!apiKey)
 
-const genAI = new GoogleGenerativeAI(apiKey!)
+const groq = new Groq({ apiKey })
 
 export async function generateMeetingSummary(transcript: string) {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" })
-
-  const prompt = `Please analyze this meeting transcript and return the result as a JSON object with:
+  const completion = await groq.chat.completions.create({
+    model: "llama3-8b-8192",
+    messages: [
+      {
+        role: "system",
+        content: "You are an AI assistant that analyzes meeting transcripts. Always respond with valid JSON only. No markdown, no code blocks, just raw JSON.",
+      },
+      {
+        role: "user",
+        content: `Please analyze this meeting transcript and return a JSON object with:
 - 'summary' (string): a concise summary of the meeting
 - 'decisions' (array of strings): key decisions made
 - 'action_items' (array of strings): action items identified
@@ -16,9 +23,12 @@ export async function generateMeetingSummary(transcript: string) {
 Return ONLY the JSON object, no markdown, no code blocks, just raw JSON.
 
 Transcript:
-${transcript}`
+${transcript}`,
+      },
+    ],
+    temperature: 0.3,
+    max_tokens: 1500,
+  })
 
-  const result = await model.generateContent(prompt)
-  const response = await result.response
-  return response.text()
+  return completion.choices[0]?.message?.content || ""
 }
