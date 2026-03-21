@@ -1,11 +1,8 @@
 import Groq from "groq-sdk"
 
-const apiKey = process.env.GROQ_API_KEY
-console.log("Groq API key present:", !!apiKey)
-
-const groq = new Groq({ apiKey })
-
 export async function generateMeetingSummary(transcript: string) {
+  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY })
+
   const completion = await groq.chat.completions.create({
     model: "llama3-8b-8192",
     messages: [
