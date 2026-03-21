@@ -10,9 +10,9 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
     // Get meeting audio URL
     const { data: meeting, error: fetchErr } = await supabase
@@ -31,25 +31,42 @@ export async function POST(req: NextRequest) {
       .download(meeting.audio_url)
 
     if (dlErr || !audioData) {
+      console.error("Download error:", dlErr)
       return NextResponse.json({ error: "Audio file not found" }, { status: 404 })
     }
 
     const audioBuffer = Buffer.from(await audioData.arrayBuffer())
 
-    // Call Deepgram API (free tier: 12,000 mins/year)
-    const dgResponse = await fetch("https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true", {
-      method: "POST",
-      headers: {
-        Authorization: `Token ${process.env.DEEPGRAM_API_KEY}`,
-        "Content-Type": "audio/mpeg",
-      },
-      body: audioBuffer,
-    })
+    // Detect content type from file extension
+    const ext = meeting.audio_url.split(".").pop()?.toLowerCase()
+    const contentTypeMap: Record<string, string> = {
+      mp3: "audio/mpeg",
+      wav: "audio/wav",
+      m4a: "audio/x-m4a",
+      mp4: "video/mp4",
+    }
+    const contentType = contentTypeMap[ext || ""] || "audio/mpeg"
+
+    // Call Deepgram API
+    const dgResponse = await fetch(
+      "https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Token ${process.env.DEEPGRAM_API_KEY}`,
+          "Content-Type": contentType,
+        },
+        body: audioBuffer,
+      }
+    )
 
     if (!dgResponse.ok) {
       const errText = await dgResponse.text()
       console.error("Deepgram error:", errText)
-      return NextResponse.json({ error: "Transcription failed" }, { status: 500 })
+      return NextResponse.json(
+        { error: `Transcription failed: ${errText}` },
+        { status: 500 }
+      )
     }
 
     const dgResult = await dgResponse.json()
@@ -63,7 +80,11 @@ export async function POST(req: NextRequest) {
       .eq("id", meetingId)
 
     if (updateErr) {
-      return NextResponse.json({ error: "Failed to save transcript" }, { status: 500 })
+      console.error("DB update error:", updateErr)
+      return NextResponse.json(
+        { error: "Failed to save transcript" },
+        { status: 500 }
+      )
     }
 
     return NextResponse.json({ success: true, transcript })
