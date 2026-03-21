@@ -1,27 +1,21 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai"
 
-export const claude = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export async function generateMeetingSummary(transcript: string) {
-  const response = await claude.messages.create({
-    model: "claude-3-haiku-20240307",
-    max_tokens: 1500,
-    system: "You are an AI assistant that summarizes meeting transcripts. Extract a concise summary, key decisions, and a list of action items.",
-    messages: [
-      {
-        role: "user",
-        content: `Please analyze this meeting transcript and return the result as a JSON object with 'summary' (string), 'decisions' (array of strings), and 'action_items' (array of strings):\n\n${transcript}`,
-      },
-    ],
-  });
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
-  const textBlock = response.content.find((block) => block.type === "text");
-  
-  if (textBlock && textBlock.type === "text") {
-    return textBlock.text;
-  }
-  
-  return "";
+  const prompt = `Please analyze this meeting transcript and return the result as a JSON object with:
+- 'summary' (string): a concise summary of the meeting
+- 'decisions' (array of strings): key decisions made
+- 'action_items' (array of strings): action items identified
+
+Return ONLY the JSON object, no markdown, no code blocks, just raw JSON.
+
+Transcript:
+${transcript}`
+
+  const result = await model.generateContent(prompt)
+  const response = await result.response
+  return response.text()
 }
