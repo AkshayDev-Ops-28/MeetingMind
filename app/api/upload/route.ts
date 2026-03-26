@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { verifyAuth } from "@/lib/auth-helpers"
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +9,10 @@ export async function POST(req: NextRequest) {
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
+    const { user, error: authError } = await verifyAuth(req)
+if (!user) {
+  return NextResponse.json({ error: authError }, { status: 401 })
+}
 
     const formData = await req.formData()
     const file = formData.get("file") as File
@@ -25,30 +30,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Get authenticated user from session header
-    const authHeader = req.headers.get("authorization")
-    if (!authHeader) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
 
-    const token = authHeader.replace("Bearer ", "")
-    // Decode JWT locally — no network call needed
-let user: { id: string } | null = null
-try {
-  const base64Payload = token.split('.')[1]
-  const payload = JSON.parse(
-    Buffer.from(base64Payload, 'base64').toString('utf8')
-  )
-  if (payload.sub && payload.exp > Date.now() / 1000) {
-    user = { id: payload.sub }
-  }
-} catch {
-  user = null
-}
-
-if (!user) {
-  return NextResponse.json({ error: "Invalid session" }, { status: 401 })
-}
 
 
     // Upload file to Supabase Storage
