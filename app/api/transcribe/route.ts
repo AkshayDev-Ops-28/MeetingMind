@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { verifyAuth } from "@/lib/auth-helpers"
 
 export async function POST(req: NextRequest) {
   try {
-    const { meetingId } = await req.json()
+    const { user, error: authError } = await verifyAuth(req)
+  if (!user) {
+  return NextResponse.json({ error: authError }, { status: 401 })
+  }
+  const { meetingId } = await req.json()
 
     if (!meetingId) {
       return NextResponse.json({ error: "Meeting ID required" }, { status: 400 })
@@ -19,6 +24,7 @@ export async function POST(req: NextRequest) {
       .from("meetings")
       .select("audio_url")
       .eq("id", meetingId)
+      .eq("user_id", user.id)
       .single()
 
     if (fetchErr || !meeting) {
@@ -78,6 +84,7 @@ export async function POST(req: NextRequest) {
       .from("meetings")
       .update({ transcript, status: "summarising" })
       .eq("id", meetingId)
+      .eq("user_id", user.id)
 
     if (updateErr) {
       console.error("DB update error:", updateErr)
