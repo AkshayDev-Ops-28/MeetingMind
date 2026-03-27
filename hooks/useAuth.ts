@@ -1,21 +1,26 @@
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase"
 
 export function useAuth() {
   const [user, setUser] = useState<{ id: string, email?: string } | null>(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
-    // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       setLoading(false)
     })
 
-    // Listen to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
+        if (event === 'SIGNED_OUT') {
+          setUser(null)
+          router.push('/auth')
+          return
+        }
         setUser(session?.user ?? null)
         setLoading(false)
       }
@@ -24,7 +29,7 @@ export function useAuth() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [supabase.auth])
+  }, [supabase.auth, router])
 
   return {
     user,
