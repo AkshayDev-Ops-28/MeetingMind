@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { generateMeetingSummary } from "@/lib/claude"
+import { verifyAuth } from "@/lib/auth-helpers"
 
 export async function POST(req: NextRequest) {
   try {
+    const { user, error: authError } = await verifyAuth(req)
+    if(!user){
+      return NextResponse.json({error: authError}, {status:401})
+    }
     const { meetingId } = await req.json()
 
     if (!meetingId) {
@@ -20,6 +25,7 @@ export async function POST(req: NextRequest) {
       .from("meetings")
       .select("transcript")
       .eq("id", meetingId)
+      .eq("user_id", user.id)
       .single()
 
     if (fetchErr || !meeting?.transcript) {
@@ -54,6 +60,7 @@ export async function POST(req: NextRequest) {
         status: "ready",
       })
       .eq("id", meetingId)
+      .eq("user_id", user.id)
 
     if (updateErr) {
       return NextResponse.json({ error: "Failed to save summary" }, { status: 500 })
