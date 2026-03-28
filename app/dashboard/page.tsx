@@ -6,6 +6,7 @@ import { StatCard } from "@/components/ui/StatCard"
 import { MeetingCard } from "@/components/meeting/MeetingCard"
 import { Clock, Video, ListMusic } from "lucide-react"
 import { useMeetings } from "@/hooks/useMeetings"
+import { SkeletonCard } from "@/components/ui/SkeletonCard"
 
 export default function DashboardPage() {
   const { meetings, loading, fetchMeetings } = useMeetings()
@@ -59,11 +60,13 @@ export default function DashboardPage() {
           </h2>
         </div>
 
-        {loading && (
-          <div className="text-gray-400 text-sm py-8 text-center">
-            Loading meetings...
-          </div>
-        )}
+       {loading && (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {[...Array(3)].map((_, i) => (
+       <SkeletonCard key={i} />
+       ))}
+   </div>
+)}
 
         {!loading && meetings.length === 0 && (
           <div className="text-center py-16 space-y-3">
