@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { verifyAuth } from "@/lib/auth-helpers"
+import { withRetry } from "@/lib/utils"
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,27 +54,30 @@ export async function POST(req: NextRequest) {
     }
     const contentType = contentTypeMap[ext || ""] || "audio/mpeg"
 
-    // Call Deepgram API
-    const dgResponse = await fetch(
-      "https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Token ${process.env.DEEPGRAM_API_KEY}`,
-          "Content-Type": contentType,
-        },
-        body: audioBuffer,
-      }
-    )
-
-    if (!dgResponse.ok) {
-      const errText = await dgResponse.text()
-      console.error("Deepgram error:", errText)
-      return NextResponse.json(
-        { error: `Transcription failed: ${errText}` },
-        { status: 500 }
-      )
+    // Call Deepgram API with retry
+const dgResponse = await withRetry(() =>
+  fetch(
+    "https://api.deepgram.com/v1/listen?model=nova-2&smart_format=true",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Token ${process.env.DEEPGRAM_API_KEY}`,
+        "Content-Type": contentType,
+      },
+      body: audioBuffer,
     }
+  )
+)
+
+if (!dgResponse.ok) {
+  const errText = await dgResponse.text()
+  console.error("Deepgram error:", errText)
+  return NextResponse.json(
+    { error: `Transcription failed: ${errText}` },
+    { status: 500 }
+  )
+}
+    
 
     const dgResult = await dgResponse.json()
     const transcript =
