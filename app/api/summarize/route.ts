@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { generateMeetingSummary } from "@/lib/claude"
 import { verifyAuth } from "@/lib/auth-helpers"
+import { withRetry } from "@/lib/utils"
 
 export async function POST(req: NextRequest) {
   try {
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Call Claude Haiku (free tier friendly)
-    const rawResult = await generateMeetingSummary(meeting.transcript)
+    const rawResult = await withRetry(() => generateMeetingSummary(meeting.transcript))
 
     // Parse JSON from Claude response
     let parsed
