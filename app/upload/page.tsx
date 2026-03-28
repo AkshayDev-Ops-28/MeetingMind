@@ -5,6 +5,7 @@ import { DropZone } from "@/components/upload/DropZone"
 import { ProcessingSteps, type ProcessingStep } from "@/components/upload/ProcessingSteps"
 import { useState } from "react"
 import { createClient } from "@/lib/supabase"
+import toast from "react-hot-toast"
 
 export default function UploadPage() {
   const [currentStep, setCurrentStep] = useState<ProcessingStep | null>(null)
@@ -20,10 +21,10 @@ export default function UploadPage() {
       
      const supabase = createClient()
       const { data: { session } } = await supabase.auth.getSession()
-console.log("Session check:", session)
 
 if (!session) {
-  alert("You must be logged in to upload.")
+toast.error( "You must be logged in to upload files");
+
   setCurrentStep(null)
   return
 }
@@ -42,19 +43,25 @@ const uploadRes = await fetch("/api/upload", {
       // Step 2: Transcribe
       setCurrentStep("transcribing")
       const transcribeRes = await fetch("/api/transcribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ meetingId }),
-      })
+       method: "POST",
+       headers: { 
+       "Content-Type": "application/json",
+       authorization: `Bearer ${session.access_token}`
+  },
+  body: JSON.stringify({ meetingId }),
+})
       if (!transcribeRes.ok) throw new Error("Transcription failed")
 
       // Step 3: Summarise
       setCurrentStep("summarising")
       const summarizeRes = await fetch("/api/summarize", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ meetingId }),
-      })
+      method: "POST",
+      headers: { 
+      "Content-Type": "application/json",
+       authorization: `Bearer ${session.access_token}`
+  },
+  body: JSON.stringify({ meetingId }),
+})
       if (!summarizeRes.ok) throw new Error("Summarization failed")
 
       // Step 4: Done
@@ -62,7 +69,7 @@ const uploadRes = await fetch("/api/upload", {
       setTimeout(() => router.push(`/meetings/${meetingId}`), 1000)
     } catch (err) {
       console.error("Pipeline error:", err)
-      alert("Something went wrong. Please try again.")
+      toast.error("Something went wrong during processing. Please try again.")
       setCurrentStep(null)
     }
   }
