@@ -32,5 +32,6 @@ jobs:
         # Provide dummy values or secrets for build
         NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:54321' }}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'dummy' }}
-        ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY || 'dummy' }}
         DEEPGRAM_API_KEY: ${{ secrets.DEEPGRAM_API_KEY || 'dummy' }}
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY || 'dummy' }}
+        SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'dummy' }}
