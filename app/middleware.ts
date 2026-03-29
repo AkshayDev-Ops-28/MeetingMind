@@ -23,12 +23,7 @@ export async function middleware(req: NextRequest) {
 
   const { data: { session } } = await supabase.auth.getSession()
 
-  const protectedPaths = ['/dashboard', '/upload', '/meetings']
-  const isProtected = protectedPaths.some(path => 
-    req.nextUrl.pathname.startsWith(path)
-  )
-
-  if (isProtected && !session) {
+  if (!session) {
     const redirectUrl = req.nextUrl.clone()
     redirectUrl.pathname = '/auth'
     return NextResponse.redirect(redirectUrl)
@@ -38,5 +33,9 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|api).*)'],
+  matcher: [
+    '/dashboard/:path*',
+    '/upload/:path*',
+    '/meetings/:path*',
+  ],
 }
