@@ -8,26 +8,25 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
-        brand: {
-          start: "#0A6B62",
-          end: "#1EA854",
-        },
-        dark: "#0A1647",
-        card: "#FFFFFF",
+        background: "var(--color-bg)",
+        foreground: "var(--color-text1)",
+        bg: "#0a0f14",
+        surface: "#111820",
+        surface2: "#16202b",
+        aqua: "#00c8d8",
+        aqua2: "#00e8ff",
+        "aqua-dim": "rgba(0,200,220,0.12)",
+        "aqua-glow": "rgba(0,200,220,0.25)",
+        text1: "#e4eef5",
+        text2: "#7a9ab5",
+        text3: "#3f5f78",
       },
       fontFamily: {
-        sans: ["var(--font-inter)"],
+        sans: ["DM Sans", "sans-serif"],
+        display: ["Space Grotesk", "sans-serif"],
       },
       boxShadow: {
-        card: "0 4px 16px rgba(10,107,98,0.12)",
-      },
-      transitionTimingFunction: {
-        DEFAULT: "ease-out",
-      },
-      transitionDuration: {
-        DEFAULT: "250ms",
+        card: "0 4px 16px rgba(0,200,220,0.12)",
       },
     },
   },

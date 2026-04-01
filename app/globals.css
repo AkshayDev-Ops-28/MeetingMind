@@ -1,24 +1,28 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
 
 @theme {
-  --color-brand-start: #0A6B62;
-  --color-brand-end: #1EA854;
-  --color-dark: #0A1647;
-  --color-card: #FFFFFF;
-  --color-page: #E4E7E4;
-  
-  --font-sans: "Inter", sans-serif;
-  
-  --shadow-card-hover: 0 4px 16px rgba(10,107,98,0.12);
-  --radius-card: 14px;
+  --color-bg: #0a0f14;
+  --color-surface: #111820;
+  --color-surface2: #16202b;
+  --color-border: rgba(0,200,220,0.10);
+  --color-border2: rgba(0,200,220,0.20);
+  --color-aqua: #00c8d8;
+  --color-aqua2: #00e8ff;
+  --color-aqua-dim: rgba(0,200,220,0.12);
+  --color-aqua-glow: rgba(0,200,220,0.25);
+  --color-text1: #e4eef5;
+  --color-text2: #7a9ab5;
+  --color-text3: #3f5f78;
+  --font-sans: 'DM Sans', sans-serif;
+  --font-display: 'Space Grotesk', sans-serif;
 }
 
 @layer base {
   body {
-    background-color: var(--color-page);
-    color: var(--color-dark);
+    background-color: var(--color-bg);
+    color: var(--color-text1);
     font-family: var(--font-sans);
-    transition: all 250ms ease-out;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -32,23 +36,23 @@
 
 @layer utilities {
   .bg-gradient-brand {
-    background: linear-gradient(135deg, var(--color-brand-start), var(--color-brand-end));
+    background: linear-gradient(135deg, #00c8d8, #00e8ff);
   }
-  
+
   .text-gradient-brand {
-    background: linear-gradient(135deg, var(--color-brand-start), var(--color-brand-end));
+    background: linear-gradient(135deg, #00c8d8, #00e8ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .card-base {
-    background-color: var(--color-card);
-    border-radius: var(--radius-card);
+    background-color: var(--color-surface);
+    border-radius: 12px;
     transition: all 250ms ease-out;
   }
 
   .card-hover:hover {
-    box-shadow: var(--shadow-card-hover);
+    border-color: var(--color-border2);
   }
 }
