@@ -29,26 +29,13 @@ export function AuthForm() {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: { full_name: fullName }
-        }
+        options: { data: { full_name: fullName } }
       })
-      if (error) {
-        setError(error.message)
-        setLoading(false)
-        return
-      }
+      if (error) { setError(error.message); setLoading(false); return }
       window.location.href = "/dashboard"
     } else {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-      if (error) {
-        setError(error.message)
-        setLoading(false)
-        return
-      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) { setError(error.message); setLoading(false); return }
       window.location.href = "/dashboard"
     }
 
@@ -56,12 +43,12 @@ export function AuthForm() {
   }
 
   return (
-    <div className="w-full max-w-sm mx-auto shadow-card hover:shadow-card-hover rounded-[14px] bg-white p-8 transition-all duration-250 ease-out">
+    <div className="w-full max-w-sm mx-auto rounded-[14px] bg-[#111820] border border-[rgba(0,200,220,0.15)] p-8 shadow-[0_0_40px_rgba(0,200,220,0.06)] transition-all duration-250">
       <div className="flex flex-col space-y-2 text-center mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-dark">
+        <h1 className="font-display text-2xl font-semibold tracking-tight text-[#e4eef5]">
           {mode === "login" ? "Welcome back" : "Create an account"}
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-[#7a9ab5]">
           {mode === "login"
             ? "Enter your email below to log into your account"
             : "Enter your details below to create your account"}
@@ -69,7 +56,7 @@ export function AuthForm() {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+        <div className="mb-4 p-3 rounded-lg bg-red-900/20 border border-red-500/30 text-red-400 text-sm">
           {error}
         </div>
       )}
@@ -77,11 +64,9 @@ export function AuthForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {mode === "signup" && (
           <div className="space-y-2">
-            <label className="text-sm font-medium leading-none text-dark">
-              Full Name
-            </label>
+            <label className="text-sm font-medium text-[#7a9ab5]">Full Name</label>
             <div className="relative">
-              <User className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+              <User className="absolute left-3 top-2.5 h-4 w-4 text-[#3f5f78]" />
               <Input
                 type="text"
                 placeholder="John Doe"
@@ -95,11 +80,9 @@ export function AuthForm() {
         )}
 
         <div className="space-y-2">
-          <label className="text-sm font-medium leading-none text-dark">
-            Email
-          </label>
+          <label className="text-sm font-medium text-[#7a9ab5]">Email</label>
           <div className="relative">
-            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-[#3f5f78]" />
             <Input
               type="email"
               placeholder="m@example.com"
@@ -112,11 +95,9 @@ export function AuthForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium leading-none text-dark">
-            Password
-          </label>
+          <label className="text-sm font-medium text-[#7a9ab5]">Password</label>
           <div className="relative">
-            <Lock className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
+            <Lock className="absolute left-3 top-2.5 h-4 w-4 text-[#3f5f78]" />
             <Input
               type="password"
               placeholder="••••••••"
@@ -134,11 +115,11 @@ export function AuthForm() {
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
-                className="rounded border-gray-300 text-brand-start focus:ring-brand-start w-4 h-4 cursor-pointer"
+                className="rounded border-[rgba(0,200,220,0.20)] bg-[#16202b] text-[#00c8d8] focus:ring-[#00c8d8] w-4 h-4 cursor-pointer"
               />
-              <span className="text-sm text-gray-600 select-none">Remember me</span>
+              <span className="text-sm text-[#7a9ab5] select-none">Remember me</span>
             </label>
-            <a href="#" className="text-sm text-brand-start font-medium hover:underline">
+            <a href="#" className="text-sm text-[#00c8d8] font-medium hover:text-[#00e8ff]">
               Forgot password?
             </a>
           </div>
@@ -147,16 +128,16 @@ export function AuthForm() {
         {mode === "login" && (
           <div className="pt-2">
             <div className="relative flex items-center mb-4">
-              <div className="flex-grow border-t border-gray-200"></div>
-              <span className="flex-shrink-0 mx-4 text-gray-400 text-xs">Or continue with</span>
-              <div className="flex-grow border-t border-gray-200"></div>
+              <div className="flex-grow border-t border-[rgba(0,200,220,0.10)]"></div>
+              <span className="flex-shrink-0 mx-4 text-[#3f5f78] text-xs">Or continue with</span>
+              <div className="flex-grow border-t border-[rgba(0,200,220,0.10)]"></div>
             </div>
             <Button
               type="button"
               variant="outline"
-              className="w-full gap-2 text-dark font-medium border-gray-200 hover:border-gray-300 shadow-sm"
+              className="w-full gap-2 font-medium"
             >
-              <ShieldCheck className="h-5 w-5 text-brand-start" />
+              <ShieldCheck className="h-5 w-5 text-[#00c8d8]" />
               Face ID Verification
             </Button>
           </div>
@@ -164,18 +145,18 @@ export function AuthForm() {
 
         <Button
           type="submit"
-          className="w-full mt-6 bg-gradient-brand hover:opacity-90 font-semibold"
+          className="w-full mt-6 font-semibold"
           disabled={loading}
         >
           {loading ? "Please wait..." : mode === "login" ? "Sign In" : "Sign Up"}
         </Button>
       </form>
 
-      <div className="mt-6 text-center text-sm text-gray-500">
+      <div className="mt-6 text-center text-sm text-[#7a9ab5]">
         {mode === "login" ? "Don't have an account? " : "Already have an account? "}
         <button
           onClick={() => setMode(mode === "login" ? "signup" : "login")}
-          className="text-brand-start font-semibold hover:underline bg-transparent border-0 p-0 cursor-pointer"
+          className="text-[#00c8d8] font-semibold hover:text-[#00e8ff] bg-transparent border-0 p-0 cursor-pointer"
         >
           {mode === "login" ? "Sign up" : "Log in"}
         </button>
